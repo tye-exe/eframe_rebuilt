@@ -17,10 +17,6 @@ use winit_app::GlowWinitApp;
 use winit_integration::WinitApp;
 use winit_wrapper::WinitAppWrapper;
 
-fn main() {
-    println!("Hello, world!");
-}
-
 pub fn run_native(
     app_name: &str,
     mut native_options: NativeOptions,

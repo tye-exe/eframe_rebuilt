@@ -294,10 +294,8 @@ impl EpiIntegration {
                 .contains(&egui::ViewportCommand::CancelClose);
             if canceled {
                 log::debug!("Closing of root viewport canceled with ViewportCommand::CancelClose");
-                println!("Closing of root viewport canceled with ViewportCommand::CancelClose");
             } else {
                 log::debug!("Closing root viewport (ViewportCommand::CancelClose was not sent)");
-                println!("Closing root viewport (ViewportCommand::CancelClose was not sent)");
                 self.close = true;
             }
         }

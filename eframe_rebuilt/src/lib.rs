@@ -1,5 +1,5 @@
 mod app_icon;
-mod epi;
+pub mod epi;
 mod epi_native;
 mod event_loop_context;
 mod stopwatch;

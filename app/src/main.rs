@@ -2,8 +2,9 @@ use std::time::Duration;
 
 fn main() {
     println!("Hello, world!");
+    env_logger::init();
 
-    loop {
+    for _ in 0..2 {
         eframe_rebuilt::run_native(
             "test",
             Default::default(),

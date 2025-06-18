@@ -142,6 +142,7 @@ dependencies = [
  "eframe_rebuilt",
  "egui",
  "env_logger",
+ "winit",
 ]
 
 [[package]]
@@ -2424,16 +2425,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "threaded_app"
-version = "0.1.0"
-dependencies = [
- "eframe_rebuilt",
- "egui",
- "env_logger",
- "winit",
 ]
 
 [[package]]

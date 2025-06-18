@@ -47,8 +47,10 @@ fn with_event_loop<R>(
         // create the event loop lazily here
         let mut event_loop_lock = event_loop.borrow_mut();
         let event_loop = if let Some(event_loop) = &mut *event_loop_lock {
+            log::debug!("Reusing existing event loop.");
             event_loop
         } else {
+            log::debug!("Creating new event loop.");
             event_loop_lock.insert(create_event_loop(&mut native_options)?)
         };
         Ok(f(event_loop, native_options))
@@ -108,10 +110,6 @@ pub enum Error {
     /// An error from [`glutin`] when using [`glow`].
     #[cfg(feature = "glow")]
     OpenGL(egui_glow::PainterError),
-
-    /// An error from [`wgpu`].
-    #[cfg(feature = "wgpu")]
-    Wgpu(egui_wgpu::WgpuError),
 }
 
 impl std::error::Error for Error {}
@@ -148,14 +146,6 @@ impl From<egui_glow::PainterError> for Error {
     }
 }
 
-#[cfg(feature = "wgpu")]
-impl From<egui_wgpu::WgpuError> for Error {
-    #[inline]
-    fn from(err: egui_wgpu::WgpuError) -> Self {
-        Self::Wgpu(err)
-    }
-}
-
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -187,11 +177,6 @@ impl std::fmt::Display for Error {
             #[cfg(feature = "glow")]
             Self::OpenGL(err) => {
                 write!(f, "egui_glow: {err}")
-            }
-
-            #[cfg(feature = "wgpu")]
-            Self::Wgpu(err) => {
-                write!(f, "WGPU error: {err}")
             }
         }
     }

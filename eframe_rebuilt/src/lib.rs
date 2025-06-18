@@ -60,9 +60,10 @@ fn create_event_loop(
 ) -> Result<EventLoop<UserEvent>, crate::Error> {
     let mut builder = winit::event_loop::EventLoop::with_user_event();
 
-    // if let Some(hook) = std::mem::take(&mut native_options.event_loop_builder) {
-    //     hook(&mut builder);
-    // }
+    //TYE: Required for threaded test.
+    if let Some(hook) = std::mem::take(&mut native_options.event_loop_builder) {
+        hook(&mut builder);
+    }
 
     // profiling::scope!("EventLoopBuilder::build");
     Ok(builder.build()?)

@@ -205,39 +205,39 @@ impl WinitApp for GlowWinitApp<'_> {
         Ok(EventResult::RepaintNow(window_id))
     }
 
-    fn suspended(&mut self, _: &ActiveEventLoop) -> Result<EventResult, crate::Error> {
-        if let Some(running) = &mut self.running {
-            running.glutin.borrow_mut().on_suspend()?;
-        }
-        Ok(EventResult::Save)
-    }
+    // fn suspended(&mut self, _: &ActiveEventLoop) -> Result<EventResult, crate::Error> {
+    //     if let Some(running) = &mut self.running {
+    //         running.glutin.borrow_mut().on_suspend()?;
+    //     }
+    //     Ok(EventResult::Save)
+    // }
 
-    fn device_event(
-        &mut self,
-        _: &ActiveEventLoop,
-        _: winit::event::DeviceId,
-        event: winit::event::DeviceEvent,
-    ) -> Result<EventResult, crate::Error> {
-        if let winit::event::DeviceEvent::MouseMotion { delta } = event {
-            if let Some(running) = &mut self.running {
-                let mut glutin = running.glutin.borrow_mut();
-                if let Some(viewport) = glutin
-                    .focused_viewport
-                    .and_then(|viewport| glutin.viewports.get_mut(&viewport))
-                {
-                    if let Some(egui_winit) = viewport.egui_winit.as_mut() {
-                        egui_winit.on_mouse_motion(delta);
-                    }
+    // fn device_event(
+    //     &mut self,
+    //     _: &ActiveEventLoop,
+    //     _: winit::event::DeviceId,
+    //     event: winit::event::DeviceEvent,
+    // ) -> Result<EventResult, crate::Error> {
+    //     if let winit::event::DeviceEvent::MouseMotion { delta } = event {
+    //         if let Some(running) = &mut self.running {
+    //             let mut glutin = running.glutin.borrow_mut();
+    //             if let Some(viewport) = glutin
+    //                 .focused_viewport
+    //                 .and_then(|viewport| glutin.viewports.get_mut(&viewport))
+    //             {
+    //                 if let Some(egui_winit) = viewport.egui_winit.as_mut() {
+    //                     egui_winit.on_mouse_motion(delta);
+    //                 }
 
-                    if let Some(window) = viewport.window.as_ref() {
-                        return Ok(EventResult::RepaintNext(window.id()));
-                    }
-                }
-            }
-        }
+    //                 if let Some(window) = viewport.window.as_ref() {
+    //                     return Ok(EventResult::RepaintNext(window.id()));
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        Ok(EventResult::Wait)
-    }
+    //     Ok(EventResult::Wait)
+    // }
 
     fn window_event(
         &mut self,

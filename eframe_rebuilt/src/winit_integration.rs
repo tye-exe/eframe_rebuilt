@@ -25,16 +25,16 @@ pub trait WinitApp {
         window_id: WindowId,
     ) -> Result<EventResult, crate::Error>;
 
-    fn suspended(&mut self, event_loop: &ActiveEventLoop) -> Result<EventResult, crate::Error>;
+    // fn suspended(&mut self, event_loop: &ActiveEventLoop) -> Result<EventResult, crate::Error>;
 
     fn resumed(&mut self, event_loop: &ActiveEventLoop) -> Result<EventResult, crate::Error>;
 
-    fn device_event(
-        &mut self,
-        event_loop: &ActiveEventLoop,
-        device_id: winit::event::DeviceId,
-        event: winit::event::DeviceEvent,
-    ) -> Result<EventResult, crate::Error>;
+    // fn device_event(
+    //     &mut self,
+    //     event_loop: &ActiveEventLoop,
+    //     device_id: winit::event::DeviceId,
+    //     event: winit::event::DeviceEvent,
+    // ) -> Result<EventResult, crate::Error>;
 
     fn window_event(
         &mut self,

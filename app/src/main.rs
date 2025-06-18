@@ -1,18 +1,44 @@
 use std::time::Duration;
 
 fn main() {
-    env_logger::init();
+    env_logger::builder().format_timestamp(None).init();
 
-    for _ in 0..2 {
+    let mut args = std::env::args();
+    args.next(); // executable path
+
+    // Which variant to run
+    let which = args
+        .next()
+        .and_then(|arg| match arg.as_str() {
+            "main" => Some(Which::MainThread),
+            "spawn" => Some(Which::SpawnedThread),
+            _ => None,
+        })
+        .unwrap_or_else(|| {
+            eprintln!(r#""main" or "spawn" not specified as an arg, default to main thread."#);
+            Which::default()
+        });
+
+    for _ in 0..1 {
         println!("Opened");
-        single_thread_gui();
+        match which {
+            Which::MainThread => main_thread_gui(),
+            Which::SpawnedThread => spawn_thread_gui(),
+        }
         println!("Closed");
-        std::thread::sleep(Duration::from_secs(2));
+        std::thread::sleep(Duration::from_secs(1));
     }
 }
 
-#[allow(dead_code)]
-fn single_thread_gui() {
+/// Whether the gui should be run on the main thread or a spawned thread.
+#[derive(Default)]
+enum Which {
+    #[default]
+    MainThread,
+    SpawnedThread,
+}
+
+fn main_thread_gui() {
     eframe_rebuilt::run_native(
         "test",
         Default::default(),
@@ -21,8 +47,7 @@ fn single_thread_gui() {
     .unwrap();
 }
 
-#[allow(dead_code)]
-fn multi_thread_gui() {
+fn spawn_thread_gui() {
     std::thread::spawn(move || {
         let options = eframe_rebuilt::epi::NativeOptions {
             event_loop_builder: Some(Box::new(move |builder| {
@@ -51,6 +76,8 @@ struct MyApp {
 
 impl eframe_rebuilt::epi::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe_rebuilt::epi::Frame) {
+        // Close the application after a few updates.
+        // This should give it time to initialise.
         if self.ticks == 2 {
             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
         }

@@ -11,6 +11,7 @@ fn main() {
     }
 }
 
+#[allow(dead_code)]
 fn single_thread_gui() {
     eframe_rebuilt::run_native(
         "test",
@@ -20,6 +21,7 @@ fn single_thread_gui() {
     .unwrap();
 }
 
+#[allow(dead_code)]
 fn multi_thread_gui() {
     std::thread::spawn(move || {
         let options = eframe_rebuilt::epi::NativeOptions {

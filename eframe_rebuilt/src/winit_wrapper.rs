@@ -42,7 +42,7 @@ impl<T: WinitApp> WinitAppWrapper<T> {
 
         log::trace!("event_result: {event_result:?}");
 
-        let mut event_result = event_result;
+        // let mut event_result = event_result;
 
         // if cfg!(target_os = "windows") {
         //     if let Ok(EventResult::RepaintNow(window_id)) = event_result {
@@ -147,14 +147,14 @@ impl<T: WinitApp> WinitAppWrapper<T> {
 }
 
 impl<T: WinitApp> ApplicationHandler<UserEvent> for WinitAppWrapper<T> {
-    fn suspended(&mut self, event_loop: &ActiveEventLoop) {
-        profiling::scope!("Event::Suspended");
+    // fn suspended(&mut self, event_loop: &ActiveEventLoop) {
+    //     profiling::scope!("Event::Suspended");
 
-        event_loop_context::with_event_loop_context(event_loop, move || {
-            let event_result = self.winit_app.suspended(event_loop);
-            self.handle_event_result(event_loop, event_result);
-        });
-    }
+    //     event_loop_context::with_event_loop_context(event_loop, move || {
+    //         let event_result = self.winit_app.suspended(event_loop);
+    //         self.handle_event_result(event_loop, event_result);
+    //     });
+    // }
 
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         profiling::scope!("Event::Resumed");
@@ -166,29 +166,29 @@ impl<T: WinitApp> ApplicationHandler<UserEvent> for WinitAppWrapper<T> {
         });
     }
 
-    fn exiting(&mut self, event_loop: &ActiveEventLoop) {
-        // On Mac, Cmd-Q we get here and then `run_app_on_demand` doesn't return (despite its name),
-        // so we need to save state now:
-        log::debug!("Received Event::LoopExiting - saving app state…");
-        event_loop_context::with_event_loop_context(event_loop, move || {
-            self.winit_app.save_and_destroy();
-        });
-    }
+    // fn exiting(&mut self, event_loop: &ActiveEventLoop) {
+    //     // On Mac, Cmd-Q we get here and then `run_app_on_demand` doesn't return (despite its name),
+    //     // so we need to save state now:
+    //     log::debug!("Received Event::LoopExiting - saving app state…");
+    //     event_loop_context::with_event_loop_context(event_loop, move || {
+    //         self.winit_app.save_and_destroy();
+    //     });
+    // }
 
-    fn device_event(
-        &mut self,
-        event_loop: &ActiveEventLoop,
-        device_id: winit::event::DeviceId,
-        event: winit::event::DeviceEvent,
-    ) {
-        profiling::function_scope!(egui_winit::short_device_event_description(&event));
+    // fn device_event(
+    //     &mut self,
+    //     event_loop: &ActiveEventLoop,
+    //     device_id: winit::event::DeviceId,
+    //     event: winit::event::DeviceEvent,
+    // ) {
+    //     profiling::function_scope!(egui_winit::short_device_event_description(&event));
 
-        // Nb: Make sure this guard is dropped after this function returns.
-        event_loop_context::with_event_loop_context(event_loop, move || {
-            let event_result = self.winit_app.device_event(event_loop, device_id, event);
-            self.handle_event_result(event_loop, event_result);
-        });
-    }
+    //     // Nb: Make sure this guard is dropped after this function returns.
+    //     event_loop_context::with_event_loop_context(event_loop, move || {
+    //         let event_result = self.winit_app.device_event(event_loop, device_id, event);
+    //         self.handle_event_result(event_loop, event_result);
+    //     });
+    // }
 
     fn user_event(&mut self, event_loop: &ActiveEventLoop, event: UserEvent) {
         profiling::function_scope!(match &event {
@@ -233,13 +233,13 @@ impl<T: WinitApp> ApplicationHandler<UserEvent> for WinitAppWrapper<T> {
         });
     }
 
-    fn new_events(&mut self, event_loop: &ActiveEventLoop, cause: winit::event::StartCause) {
-        if let winit::event::StartCause::ResumeTimeReached { .. } = cause {
-            log::trace!("Woke up to check next_repaint_time");
-        }
+    // fn new_events(&mut self, event_loop: &ActiveEventLoop, cause: winit::event::StartCause) {
+    //     if let winit::event::StartCause::ResumeTimeReached { .. } = cause {
+    //         log::trace!("Woke up to check next_repaint_time");
+    //     }
 
-        self.check_redraw_requests(event_loop);
-    }
+    //     self.check_redraw_requests(event_loop);
+    // }
 
     fn window_event(
         &mut self,

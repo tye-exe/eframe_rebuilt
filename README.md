@@ -9,3 +9,11 @@ To build eframe re-implementation
 ```
 cargo build -F glow
 ```
+
+### Comparing main thread to spawned thread
+To generate the log outputs for eframe on the main thread and eframe on a spawned thread you can run:
+```bash
+bash compare.sh
+```
+The logs files `out_main` & `out_spawn` will be generated with the outputs for the main thread & spawned thread respectively.
+The difference between the two can be analysed with a tool such as `diff`.

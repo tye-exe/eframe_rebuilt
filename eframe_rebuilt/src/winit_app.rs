@@ -277,8 +277,6 @@ impl GlowWinitRunning<'_> {
             return Ok(EventResult::Wait);
         };
 
-        // Returning here results in no window appearing.
-
         profiling::finish_frame!();
 
         let mut frame_timer = crate::stopwatch::Stopwatch::new();
@@ -299,8 +297,6 @@ impl GlowWinitRunning<'_> {
                 return Ok(EventResult::Wait);
             }
         }
-
-        // return Ok(EventResult::Wait);
 
         let (raw_input, viewport_ui_cb) = {
             let mut glutin = self.glutin.borrow_mut();
@@ -331,47 +327,6 @@ impl GlowWinitRunning<'_> {
             (raw_input, viewport_ui_cb)
         };
 
-        // return Ok(EventResult::Wait);
-
-        let clear_color = self
-            .app
-            .clear_color(&self.integration.egui_ctx.style().visuals);
-
-        let has_many_viewports = self.glutin.borrow().viewports.len() > 1;
-        let clear_before_update = !has_many_viewports; // HACK: for some reason, an early clear doesn't "take" on Mac with multiple viewports.
-
-        // Removing this results in a transparent window //
-        // if clear_before_update {
-        //     // clear before we call update, so users can paint between clear-color and egui windows:
-
-        //     let mut glutin = self.glutin.borrow_mut();
-        //     let GlutinWindowContext {
-        //         viewports,
-        //         current_gl_context,
-        //         not_current_gl_context,
-        //         ..
-        //     } = &mut *glutin;
-        //     let viewport = &viewports[&viewport_id];
-        //     let Some(window) = viewport.window.as_ref() else {
-        //         return Ok(EventResult::Wait);
-        //     };
-        //     let Some(gl_surface) = viewport.gl_surface.as_ref() else {
-        //         return Ok(EventResult::Wait);
-        //     };
-
-        //     let screen_size_in_pixels: [u32; 2] = window.inner_size().into();
-
-        //     {
-        //         frame_timer.pause();
-        //         change_gl_context(current_gl_context, not_current_gl_context, gl_surface);
-        //         frame_timer.resume();
-        //     }
-
-        //     self.painter
-        //         .borrow()
-        //         .clear(screen_size_in_pixels, clear_color);
-        // }
-
         // ------------------------------------------------------------
         // The update function, which could call immediate viewports,
         // so make sure we don't hold any locks here required by the immediate viewports rendeer.
@@ -391,7 +346,6 @@ impl GlowWinitRunning<'_> {
         } = self;
 
         let mut glutin = glutin.borrow_mut();
-        let mut painter = painter.borrow_mut();
 
         let egui::FullOutput {
             platform_output,
@@ -415,34 +369,9 @@ impl GlowWinitRunning<'_> {
         };
 
         viewport.info.events.clear(); // they should have been processed
-        let window = viewport.window.clone().unwrap();
         let gl_surface = viewport.gl_surface.as_ref().unwrap();
-        let egui_winit = viewport.egui_winit.as_mut().unwrap();
 
-        egui_winit.handle_platform_output(&window, platform_output);
-
-        let clipped_primitives = integration.egui_ctx.tessellate(shapes, pixels_per_point);
-
-        {
-            // We may need to switch contexts again, because of immediate viewports:
-            frame_timer.pause();
-            change_gl_context(current_gl_context, not_current_gl_context, gl_surface);
-            frame_timer.resume();
-        }
-
-        let screen_size_in_pixels: [u32; 2] = window.inner_size().into();
-
-        if !clear_before_update {
-            painter.clear(screen_size_in_pixels, clear_color);
-        }
-
-        painter.paint_and_update_textures(
-            screen_size_in_pixels,
-            pixels_per_point,
-            &clipped_primitives,
-            &textures_delta,
-        );
-
+        // Required to draw the window
         {
             // vsync - don't count as frame-time:
             frame_timer.pause();
@@ -457,26 +386,8 @@ impl GlowWinitRunning<'_> {
             frame_timer.resume();
         }
 
-        // give it time to settle:
-        #[cfg(feature = "__screenshot")]
-        if integration.egui_ctx.cumulative_pass_nr() == 2 {
-            if let Ok(path) = std::env::var("EFRAME_SCREENSHOT_TO") {
-                save_screenshot_and_exit(&path, &painter, screen_size_in_pixels);
-            }
-        }
-
+        // Required
         glutin.handle_viewport_output(event_loop, &integration.egui_ctx, &viewport_output);
-
-        integration.report_frame_time(frame_timer.total_time_sec()); // don't count auto-save time as part of regular frame time
-
-        integration.maybe_autosave(app.as_mut(), Some(&window));
-
-        if window.is_minimized() == Some(true) {
-            // On Mac, a minimized Window uses up all CPU:
-            // https://github.com/emilk/egui/issues/325
-            profiling::scope!("minimized_sleep");
-            std::thread::sleep(std::time::Duration::from_millis(10));
-        }
 
         if integration.should_close() {
             Ok(EventResult::Exit)

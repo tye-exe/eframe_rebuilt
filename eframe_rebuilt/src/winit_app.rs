@@ -277,6 +277,8 @@ impl GlowWinitRunning<'_> {
             return Ok(EventResult::Wait);
         };
 
+        // Returning here results in no window appearing.
+
         profiling::finish_frame!();
 
         let mut frame_timer = crate::stopwatch::Stopwatch::new();
@@ -297,6 +299,8 @@ impl GlowWinitRunning<'_> {
                 return Ok(EventResult::Wait);
             }
         }
+
+        // return Ok(EventResult::Wait);
 
         let (raw_input, viewport_ui_cb) = {
             let mut glutin = self.glutin.borrow_mut();
@@ -326,6 +330,8 @@ impl GlowWinitRunning<'_> {
 
             (raw_input, viewport_ui_cb)
         };
+
+        // return Ok(EventResult::Wait);
 
         let clear_color = self
             .app
@@ -435,43 +441,6 @@ impl GlowWinitRunning<'_> {
             &clipped_primitives,
             &textures_delta,
         );
-
-        {
-            for action in viewport.actions_requested.drain() {
-                match action {
-                    ActionRequested::Screenshot(user_data) => {
-                        let screenshot = painter.read_screen_rgba(screen_size_in_pixels);
-                        egui_winit
-                            .egui_input_mut()
-                            .events
-                            .push(egui::Event::Screenshot {
-                                viewport_id,
-                                user_data,
-                                image: screenshot.into(),
-                            });
-                    }
-                    ActionRequested::Cut => {
-                        egui_winit.egui_input_mut().events.push(egui::Event::Cut);
-                    }
-                    ActionRequested::Copy => {
-                        egui_winit.egui_input_mut().events.push(egui::Event::Copy);
-                    }
-                    ActionRequested::Paste => {
-                        if let Some(contents) = egui_winit.clipboard_text() {
-                            let contents = contents.replace("\r\n", "\n");
-                            if !contents.is_empty() {
-                                egui_winit
-                                    .egui_input_mut()
-                                    .events
-                                    .push(egui::Event::Paste(contents));
-                            }
-                        }
-                    }
-                }
-            }
-
-            integration.post_rendering(&window);
-        }
 
         {
             // vsync - don't count as frame-time:

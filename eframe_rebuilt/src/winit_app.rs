@@ -127,10 +127,12 @@ struct Viewport {
 // }
 
 impl WinitApp for GlowWinitApp<'_> {
+    // Returning `None` makes the request callback wait until window interaction.
     fn egui_ctx(&self) -> Option<&egui::Context> {
         self.running.as_ref().map(|r| &r.integration.egui_ctx)
     }
 
+    // Returning `None` just results in weird, laggy behaviour.
     fn window(&self, window_id: WindowId) -> Option<Arc<Window>> {
         let running = self.running.as_ref()?;
         let glutin = running.glutin.borrow();
@@ -142,6 +144,7 @@ impl WinitApp for GlowWinitApp<'_> {
         }
     }
 
+    // `None` requires pointer to be over egui window for updates to happen.
     fn window_id_from_viewport_id(&self, id: ViewportId) -> Option<WindowId> {
         self.running
             .as_ref()
@@ -175,6 +178,7 @@ impl WinitApp for GlowWinitApp<'_> {
         }
     }
 
+    // Returning `EventResult::Wait` causes a window to never open, but for a panel icon to appear.
     fn run_ui_and_paint(
         &mut self,
         event_loop: &ActiveEventLoop,
@@ -239,17 +243,19 @@ impl WinitApp for GlowWinitApp<'_> {
     //     Ok(EventResult::Wait)
     // }
 
+    // Seems to not effect close delay
     fn window_event(
         &mut self,
         _: &ActiveEventLoop,
         window_id: WindowId,
         event: winit::event::WindowEvent,
     ) -> Result<EventResult, crate::Error> {
-        if let Some(running) = &mut self.running {
-            Ok(running.on_window_event(window_id, &event))
-        } else {
-            Ok(EventResult::Wait)
-        }
+        // if let Some(running) = &mut self.running {
+        //     Ok(running.on_window_event(window_id, &event))
+        // } else {
+        //     Ok(EventResult::Wait)
+        // }
+        Ok(EventResult::Wait)
     }
 }
 

@@ -78,11 +78,13 @@ impl eframe_rebuilt::epi::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe_rebuilt::epi::Frame) {
         // Close the application after a few updates.
         // This should give it time to initialise.
-        if self.ticks == 2 {
+        if self.ticks >= 2 {
             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
         }
 
-        self.ticks += 1;
+        if self.ticks < 2 {
+            self.ticks += 1;
+        }
         ctx.request_repaint();
     }
 }

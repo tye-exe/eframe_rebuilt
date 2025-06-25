@@ -279,9 +279,6 @@ impl GlowWinitRunning<'_> {
 
         profiling::finish_frame!();
 
-        let mut frame_timer = crate::stopwatch::Stopwatch::new();
-        frame_timer.start();
-
         {
             let glutin = self.glutin.borrow();
             let viewport = &glutin.viewports[&viewport_id];
@@ -300,14 +297,12 @@ impl GlowWinitRunning<'_> {
 
         let (raw_input, viewport_ui_cb) = {
             let mut glutin = self.glutin.borrow_mut();
-            let egui_ctx = glutin.egui_ctx.clone();
             let Some(viewport) = glutin.viewports.get_mut(&viewport_id) else {
                 return Ok(EventResult::Wait);
             };
             let Some(window) = viewport.window.as_ref() else {
                 return Ok(EventResult::Wait);
             };
-            egui_winit::update_viewport_info(&mut viewport.info, &egui_ctx, window, false);
 
             let Some(egui_winit) = viewport.egui_winit.as_mut() else {
                 return Ok(EventResult::Wait);
@@ -315,9 +310,6 @@ impl GlowWinitRunning<'_> {
             let mut raw_input = egui_winit.take_egui_input(window);
             let viewport_ui_cb = viewport.viewport_ui_cb.clone();
 
-            self.integration.pre_update();
-
-            raw_input.time = Some(self.integration.beginning.elapsed().as_secs_f64());
             raw_input.viewports = glutin
                 .viewports
                 .iter()
@@ -374,7 +366,6 @@ impl GlowWinitRunning<'_> {
         // Required to draw the window
         {
             // vsync - don't count as frame-time:
-            frame_timer.pause();
             profiling::scope!("swap_buffers");
             let context = current_gl_context
                 .as_ref()
@@ -383,7 +374,6 @@ impl GlowWinitRunning<'_> {
                 ))?;
 
             gl_surface.swap_buffers(context)?;
-            frame_timer.resume();
         }
 
         // Required

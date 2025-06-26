@@ -255,11 +255,13 @@ impl WinitApp for GlowWinitApp<'_> {
         // } else {
         //     Ok(EventResult::Wait)
         // }
+
         Ok(EventResult::Wait)
     }
 }
 
 impl GlowWinitRunning<'_> {
+    // STRIPPED
     fn run_ui_and_paint(
         &mut self,
         event_loop: &ActiveEventLoop,

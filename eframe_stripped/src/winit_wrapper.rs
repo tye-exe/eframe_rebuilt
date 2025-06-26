@@ -251,6 +251,10 @@ impl<T: WinitApp> ApplicationHandler<UserEvent> for WinitAppWrapper<T> {
 
         // Nb: Make sure this guard is dropped after this function returns.
         event_loop_context::with_event_loop_context(event_loop, move || {
+            if matches!(event, winit::event::WindowEvent::CloseRequested) {
+                event_loop.exit();
+                return;
+            }
             let event_result = match event {
                 winit::event::WindowEvent::RedrawRequested => {
                     self.winit_app.run_ui_and_paint(event_loop, window_id)

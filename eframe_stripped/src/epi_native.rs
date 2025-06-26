@@ -286,15 +286,15 @@ impl EpiIntegration {
 
         let is_root_viewport = viewport_ui_cb.is_none();
         if is_root_viewport && close_requested {
-            let canceled = full_output.viewport_output[&ViewportId::ROOT]
-                .commands
-                .contains(&egui::ViewportCommand::CancelClose);
-            if canceled {
-                log::debug!("Closing of root viewport canceled with ViewportCommand::CancelClose");
-            } else {
-                log::debug!("Closing root viewport (ViewportCommand::CancelClose was not sent)");
-                self.close = true;
-            }
+            log::debug!("Closing root viewport (ViewportCommand::CancelClose was not sent)");
+            self.close = true;
+            // let canceled = full_output.viewport_output[&ViewportId::ROOT]
+            //     .commands
+            //     .contains(&egui::ViewportCommand::CancelClose);
+            // if canceled {
+            //     log::debug!("Closing of root viewport canceled with ViewportCommand::CancelClose");
+            // } else {
+            // }
         }
 
         self.pending_full_output.append(full_output);

@@ -1,3 +1,4 @@
+use eframe_stripped as eframe;
 use std::time::Duration;
 
 fn main() {
@@ -39,7 +40,7 @@ enum Which {
 }
 
 fn main_thread_gui() {
-    eframe_rebuilt::run_native(
+    eframe::run_native(
         "test",
         Default::default(),
         Box::new(|_| Ok(Box::new(MyApp::default()))),
@@ -49,7 +50,7 @@ fn main_thread_gui() {
 
 fn spawn_thread_gui() {
     std::thread::spawn(move || {
-        let options = eframe_rebuilt::epi::NativeOptions {
+        let options = eframe::epi::NativeOptions {
             event_loop_builder: Some(Box::new(move |builder| {
                 use winit::platform::wayland::EventLoopBuilderExtWayland;
 
@@ -58,7 +59,7 @@ fn spawn_thread_gui() {
             ..Default::default()
         };
 
-        eframe_rebuilt::run_native(
+        eframe::run_native(
             "test",
             options,
             Box::new(|_| Ok(Box::new(MyApp::default()))),
@@ -74,8 +75,8 @@ struct MyApp {
     ticks: u8,
 }
 
-impl eframe_rebuilt::epi::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe_rebuilt::epi::Frame) {
+impl eframe::epi::App for MyApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::epi::Frame) {
         // Close the application after a few updates.
         // This should give it time to initialise.
         if self.ticks >= 2 {

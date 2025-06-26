@@ -1,4 +1,10 @@
-use eframe_stripped as eframe;
+// use eframe_stripped as eframe;
+// use eframe_stripped::epi::App;
+// use eframe_stripped::epi::Frame;
+
+use eframe_rebuilt as eframe;
+use eframe_rebuilt::App;
+use eframe_rebuilt::Frame;
 use std::time::Duration;
 
 fn main() {
@@ -20,11 +26,11 @@ fn main() {
             Which::default()
         });
 
-    for _ in 0..1 {
+    for _ in 0..2 {
         println!("Opened");
         match which {
             Which::MainThread => main_thread_gui(),
-            Which::SpawnedThread => spawn_thread_gui(),
+            Which::SpawnedThread => (),
         }
         println!("Closed");
         std::thread::sleep(Duration::from_secs(1));
@@ -48,35 +54,35 @@ fn main_thread_gui() {
     .unwrap();
 }
 
-fn spawn_thread_gui() {
-    std::thread::spawn(move || {
-        let options = eframe::epi::NativeOptions {
-            event_loop_builder: Some(Box::new(move |builder| {
-                use winit::platform::wayland::EventLoopBuilderExtWayland;
+// fn spawn_thread_gui() {
+//     std::thread::spawn(move || {
+//         let options = eframe::epi::NativeOptions {
+//             event_loop_builder: Some(Box::new(move |builder| {
+//                 use winit::platform::wayland::EventLoopBuilderExtWayland;
 
-                builder.with_any_thread(true);
-            })),
-            ..Default::default()
-        };
+//                 builder.with_any_thread(true);
+//             })),
+//             ..Default::default()
+//         };
 
-        eframe::run_native(
-            "test",
-            options,
-            Box::new(|_| Ok(Box::new(MyApp::default()))),
-        )
-        .unwrap();
-    })
-    .join()
-    .unwrap();
-}
+//         eframe::run_native(
+//             "test",
+//             options,
+//             Box::new(|_| Ok(Box::new(MyApp::default()))),
+//         )
+//         .unwrap();
+//     })
+//     .join()
+//     .unwrap();
+// }
 
 #[derive(Default)]
 struct MyApp {
     ticks: u8,
 }
 
-impl eframe::epi::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::epi::Frame) {
+impl App for MyApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
         // Close the application after a few updates.
         // This should give it time to initialise.
         if self.ticks >= 2 {
@@ -87,5 +93,7 @@ impl eframe::epi::App for MyApp {
             self.ticks += 1;
         }
         ctx.request_repaint();
+
+        println!("Running");
     }
 }

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-eframe_stripped = { path = "../eframe_stripped", features = ["glow"] }
-egui = "0.31.1"
-env_logger = "0.11.8"
-winit = "0.30.11"
+eframe_stripped = { workspace = true }
+egui = { workspace = true }
+env_logger = { workspace = true }
+winit = { workspace = true }

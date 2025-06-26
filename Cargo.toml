@@ -1,3 +1,21 @@
 [workspace]
 members = ["app", "eframe_stripped"]
 resolver = "3"
+
+[workspace.dependencies]
+eframe_stripped = { path = "eframe_stripped", features = ["glow"] }
+ahash = "0.8.12"
+egui = "0.31.1"
+egui-winit = "0.31.1"
+egui_glow = "0.31.1"
+glow = "0.16.0"
+glutin = "0.32.3"
+glutin-winit = "0.5.0"
+image = { version = "0.25.6", features = ["png"] }
+log = "0.4.27"
+profiling = "1.0.16"
+raw-window-handle = "0.6.2"
+static_assertions = "1.1.0"
+web-time = "1.1.0"
+winit = "0.30.11"
+env_logger = "0.11.8"
